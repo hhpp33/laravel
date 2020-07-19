@@ -111,8 +111,9 @@ class Kernel implements KernelContract
     public function handle($request)
     {
         try {
+            // 添加csrf保护
             $request->enableHttpMethodParameterOverride();
-
+            // 通过路由器和中间件处理请求，返回请求响应实例
             $response = $this->sendRequestThroughRouter($request);
         } catch (Exception $e) {
             $this->reportException($e);
@@ -139,12 +140,18 @@ class Kernel implements KernelContract
      */
     protected function sendRequestThroughRouter($request)
     {
+        // 将请求绑定到容器中
         $this->app->instance('request', $request);
-
+        // 使用Facade时若不存在，则从app获取
         Facade::clearResolvedInstance('request');
-
+        // 启动app容器，完成初始化工作，
+        // 加载env、config配置
+        // 设置错误和异常回调函数
+        // 设置Facade别名加载
+        // 注册和启动服务提供者
         $this->bootstrap();
-
+        // 使用管道，处理中间件和路由
+        // Request经过基础的中间件、通过Router匹配查找Request对应的路由、执行匹配到的路由、Request经过路由上到中间件到达控制器方法
         return (new Pipeline($this->app))
                     ->send($request)
                     ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)

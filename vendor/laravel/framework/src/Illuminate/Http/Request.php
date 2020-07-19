@@ -48,14 +48,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $routeResolver;
 
     /**
+     * 创建Request实例
+     *
      * Create a new Illuminate HTTP request from server variables.
      *
      * @return static
      */
     public static function capture()
     {
+        // 伪造http请求，添加csrf保护
         static::enableHttpMethodParameterOverride();
-
+        // 封装了有关 HTTP 请求和响应的一切信息，包括请求、响应、头、Cookie、文件等
         return static::createFromBase(SymfonyRequest::createFromGlobals());
     }
 
@@ -70,6 +73,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * 请求方法的获取
      * Get the request method.
      *
      * @return string
@@ -129,6 +133,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * 获取请求的路径
      * Get the current path info for the request.
      *
      * @return string
