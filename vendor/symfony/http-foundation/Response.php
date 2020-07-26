@@ -363,17 +363,20 @@ class Response
         return $this;
     }
 
-    /**
+    /**发送响应
      * Sends HTTP headers and content.
      *
      * @return $this
      */
     public function send()
     {
+        // 1. 设置响应header
         $this->sendHeaders();
+        // 2. 设置响应内容
         $this->sendContent();
 
         if (\function_exists('fastcgi_finish_request')) {
+            // 3.若是FastCGI模式，发送响应，关闭连接，但不会结束php运行
             fastcgi_finish_request();
         } elseif (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             static::closeOutputBuffers(0, true);

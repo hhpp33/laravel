@@ -699,6 +699,7 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * 创建响应对象
      * Static version of prepareResponse.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -708,10 +709,12 @@ class Router implements RegistrarContract, BindingRegistrar
     public static function toResponse($request, $response)
     {
         if ($response instanceof Responsable) {
+            // 1. Responsable 接口响应
             $response = $response->toResponse($request);
         }
 
         if ($response instanceof PsrResponseInterface) {
+            // 2. Psr规范中响应
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
@@ -719,15 +722,18 @@ class Router implements RegistrarContract, BindingRegistrar
                     $response instanceof ArrayObject ||
                     $response instanceof JsonSerializable ||
                     is_array($response))) {
+            // 3. json响应
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
+            // 4. 普通
             $response = new Response($response);
         }
 
+        // 5. http 状态 304 处理
         if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
             $response->setNotModified();
         }
-
+       // 6. 在响应被发送给客户端之前对其进行修订使其能遵从HTTP/1.1协议
         return $response->prepare($request);
     }
 
