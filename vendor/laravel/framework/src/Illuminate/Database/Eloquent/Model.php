@@ -138,6 +138,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     const UPDATED_AT = 'updated_at';
 
     /**
+     * 创建Eloquent模型实例
      * Create a new Eloquent model instance.
      *
      * @param  array  $attributes
@@ -145,10 +146,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __construct(array $attributes = [])
     {
+        // 1. 标记模型被启动，并且触发模型启动的前置与后置事件
         $this->bootIfNotBooted();
 
+        // 2. 保存原始对象数据
         $this->syncOriginal();
 
+        // 3. 初始化模型的属性
         $this->fill($attributes);
     }
 
@@ -349,6 +353,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * 从模型中获取所有数据集合
      * Get all of the models from the database.
      *
      * @param  array|mixed  $columns
@@ -827,6 +832,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * 生成一个查询构造器
      * Get a new query builder for the model's table.
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -837,6 +843,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     *
      * Get a new query builder that doesn't have any global scopes or eager loading.
      *
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -927,14 +934,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * 获取一个针对连接的查询构造器
      * Get a new query builder instance for the connection.
      *
      * @return \Illuminate\Database\Query\Builder
      */
     protected function newBaseQueryBuilder()
     {
+        //  1.获取数据库连接
         $connection = $this->getConnection();
 
+        // 2.实例化QueryBuilder 查询构造器
         return new QueryBuilder(
             $connection, $connection->getQueryGrammar(), $connection->getPostProcessor()
         );
@@ -1094,7 +1104,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return ! $this->is($model);
     }
 
-    /**
+    /**通过模型获取数据库连接
+     *
      * Get the database connection for the model.
      *
      * @return \Illuminate\Database\Connection
@@ -1128,6 +1139,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * 获取一个连接实例
      * Resolve a connection instance.
      *
      * @param  string|null  $connection
